@@ -37,3 +37,19 @@ mongoDB.findQuestion = function(collection, queryCondition) {
     });
     return deferred.promise;
 }
+
+mongoDB.insertQuestion = function(collection, docObject, reqObject) {
+    var deferred = Q.defer();
+    MongoClient.connect(url, function(err, db) {
+        db.collection(collection).save(docObject, function(err, result) {
+            if (err) {
+                console.error(err);
+                deferred.reject(err);
+            } else {
+                deferred.resolve(result);
+            }
+            db.close();
+        });
+    });
+    return deferred.promise;
+}

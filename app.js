@@ -8,6 +8,23 @@ var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var common = require('./routes/common/index');
 var mongoDB = require('./utils/mongoUtils');
+var fileUtils = require('./utils/fileUtils');
+
+
+var multer = require('multer');
+//文件保存路径
+var storage = multer.diskStorage({
+    //设置上传后文件路径，uploads文件夹会自动创建。
+    destination: function(req, file, cb) {
+        cb(null, './uploads')
+    },
+    //给上传文件重命名，获取添加后缀名
+    filename: function(req, file, cb) {
+        var fileFormat = (file.originalname).split(".");
+        cb(null, file.fieldname + '-' + Date.now() + "." + fileFormat[fileFormat.length - 1]);
+    }
+});
+var upload = multer({ storage: storage });
 
 
 var app = express();
@@ -46,6 +63,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoDB.isOnline();
 app.use('/', routes);
 app.use('/common', common);
+
+app.post('/file', upload.single('sample'), function(req, res, next) {
+
+    var result = fileUtils.parseXlsxToList(req.file.filename);
+
+    res.send('上传成功！');
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

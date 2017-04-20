@@ -19,10 +19,11 @@ function Methods(obj) {
 Methods.getActionName = function(req, res, nextf) {
     var data = req.body;
     Mongo.findQuestion('action', data).done(function(data) {
+        console.log(data);
         if (data.length > 0) {
             res.json({
                 status: true,
-                name: data[0].name
+                data: data[0]
             });
         } else {
             res.json({
